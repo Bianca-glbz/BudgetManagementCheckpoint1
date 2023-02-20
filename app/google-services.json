@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "938239404204",
+    "project_id": "budgetmanagementcheckpoint1",
+    "storage_bucket": "budgetmanagementcheckpoint1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:938239404204:android:7513075d2f9a53fd7ed709",
+        "android_client_info": {
+          "package_name": "com.example.budgetmanagementcheckpoint1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "938239404204-u0aicei2hmfvv7rt1o19impvjmbbv8g3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASYuOHRjRT6Kmt6Y9c-6wWOMiXC4mjNhw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "938239404204-u0aicei2hmfvv7rt1o19impvjmbbv8g3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
