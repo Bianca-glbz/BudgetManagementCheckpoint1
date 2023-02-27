@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.budgetmanagementcheckpoint1.R;
+import com.example.budgetmanagementcheckpoint1.utils.Categories;
 import com.example.budgetmanagementcheckpoint1.utils.StatementTransaction;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -75,17 +76,17 @@ import java.util.List;
             holder.description.setText(String.format("DESCRIPTION: %s", transaction.getDescription()));
             holder.amount.setText(String.format("EUR %s", transaction.getTransactionType() == StatementTransaction.DEBIT ? transaction.getDebitAmount() : transaction.getCreditAmount()));
 
-            String[] categories ={"unknown", "travel", "entertainment","groceries","transport"};
+            // String[] categories ={"unknown", "other", "Phone", "car", "clothing", "loan", "travel", "beauty", "entertainment","groceries","transport"};
 
             ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
                     (activity, android.R.layout.simple_spinner_item,
-                            categories); //selected item will look like a spinner set from XML
+                            Categories.list); //selected item will look like a spinner set from XML
             spinnerArrayAdapter.setDropDownViewResource(android.R.layout
                     .simple_spinner_dropdown_item);
             holder.categoryDropdown.setAdapter(spinnerArrayAdapter);
 
 
-            int currentCateogry = Arrays.asList(categories).indexOf(transaction.getCategory());
+            int currentCateogry = Arrays.asList(Categories.list).indexOf(transaction.getCategory());
 
             // use current month as default selection
             holder.categoryDropdown.setSelection(currentCateogry);
@@ -93,7 +94,7 @@ import java.util.List;
             holder.categoryDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                    transaction.setCategory(categories[i]);
+                    transaction.setCategory(Categories.list[i]);
                 }
 
                 @Override

@@ -90,6 +90,7 @@ public class ManageTransactionsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(ManageTransactionsActivity.this, TransactionActivity.class);
+                i.putExtra("selectedMonth", selectedMonth);
                 startActivity(i);
             }
         });
