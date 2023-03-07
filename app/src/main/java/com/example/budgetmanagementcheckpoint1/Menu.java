@@ -12,6 +12,7 @@ import com.example.budgetmanagementcheckpoint1.fragments.HomeFragment;
 import com.example.budgetmanagementcheckpoint1.fragments.PersonFragment;
 import com.example.budgetmanagementcheckpoint1.fragments.SearchFragment;
 import com.example.budgetmanagementcheckpoint1.fragments.SettingsFragment;
+import com.example.budgetmanagementcheckpoint1.fragments.StatsFragment;
 
 public class Menu extends AppCompatActivity {
 
@@ -40,6 +41,9 @@ public class Menu extends AppCompatActivity {
                   break;
               case R.id.settings:
                   replaceFragment( new SettingsFragment());
+                  break;
+              case R.id.stats:
+                  replaceFragment( new StatsFragment());
                   break;
 
 

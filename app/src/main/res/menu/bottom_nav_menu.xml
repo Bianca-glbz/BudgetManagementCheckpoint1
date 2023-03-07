@@ -17,4 +17,9 @@
         android:title="Settings"
         android:icon="@drawable/ic_baseline_settings_24"
         android:id="@+id/settings"/>
+    <item
+        android:title="Stats"
+        android:icon="@drawable/ic_baseline_bar_chart_24"
+        android:id="@+id/stats"/>
+
 </menu>
