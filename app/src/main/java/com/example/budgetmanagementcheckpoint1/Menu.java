@@ -10,7 +10,7 @@ import android.os.Bundle;
 import com.example.budgetmanagementcheckpoint1.databinding.ActivityMenuBinding;
 import com.example.budgetmanagementcheckpoint1.fragments.HomeFragment;
 import com.example.budgetmanagementcheckpoint1.fragments.PersonFragment;
-import com.example.budgetmanagementcheckpoint1.fragments.SearchFragment;
+import com.example.budgetmanagementcheckpoint1.fragments.BudgetPlanFragment;
 import com.example.budgetmanagementcheckpoint1.fragments.SettingsFragment;
 import com.example.budgetmanagementcheckpoint1.fragments.StatsFragment;
 
@@ -36,8 +36,8 @@ public class Menu extends AppCompatActivity {
               case R.id.person:
                   replaceFragment( new PersonFragment());
                   break;
-              case R.id.search:
-                  replaceFragment( new SearchFragment());
+              case R.id.budgetPlan:
+                  replaceFragment( new BudgetPlanFragment());
                   break;
               case R.id.settings:
                   replaceFragment( new SettingsFragment());

@@ -49,6 +49,7 @@ public class TransactionActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         String selectedMonth = getIntent().getStringExtra("selectedMonth");
+        String selectedYear = getIntent().getStringExtra("selectedYear");
 
         //transaction added manually
         EditText descriptionInput = findViewById(R.id.descriptionInput);
@@ -112,7 +113,7 @@ public class TransactionActivity extends AppCompatActivity {
                 // Create a new user with a first and last name
 
                 StatementTransaction transaction = new StatementTransaction("n/a",dateInput.getText().toString(),descriptionInput.getText().toString(),Float.parseFloat(amountInput.getText().toString()),
-                        -1,selectedType,Categories.list[currentCateogry]);
+                        -1,selectedType,Categories.list[currentCateogry],Integer.parseInt(selectedYear));
 
                 String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 String[] months = {"january","february","march","april","may","june","july","august","september","october","november","december"};

@@ -10,9 +10,9 @@
         android:icon="@drawable/ic_baseline_person_24"
         android:id="@+id/person"/>
     <item
-        android:title="Search"
-        android:icon="@drawable/ic_baseline_search_24"
-        android:id="@+id/search"/>
+        android:title="Budget Plan"
+        android:icon="@drawable/ic_money"
+        android:id="@+id/budgetPlan"/>
     <item
         android:title="Settings"
         android:icon="@drawable/ic_baseline_settings_24"

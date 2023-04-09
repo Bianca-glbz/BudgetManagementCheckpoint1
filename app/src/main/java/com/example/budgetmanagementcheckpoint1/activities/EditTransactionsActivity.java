@@ -84,6 +84,11 @@ public class EditTransactionsActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         List<String> transactionsCSV = (List<String>) documentSnapshot.get(selectedMonth);
+                        if(transactionsCSV == null){
+                            Toast.makeText(EditTransactionsActivity.this,"No data found for this month",Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
                         transactions.clear();
                         for(int i=0; i<transactionsCSV.size();i++){
                            // if(transactionsCSV.get(i).getClass().isArray()){
