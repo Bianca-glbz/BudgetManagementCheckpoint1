@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.example.budgetmanagementcheckpoint1.R;
 import com.example.budgetmanagementcheckpoint1.adapters.EditTransactionsAdapter;
 import com.example.budgetmanagementcheckpoint1.utils.DateList;
+import com.example.budgetmanagementcheckpoint1.utils.FirebaseUtils;
 import com.example.budgetmanagementcheckpoint1.utils.StatementTransaction;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -48,94 +49,20 @@ public class ManageTransactionsActivity extends AppCompatActivity {
     String[] months = {"january","february","march","april","may","june","july","august","september","october","november","december"};
     String selectedMonth = "";
     String selectedYear = "";
+    ActivityResultLauncher<Intent> startActivityForResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_transactions);
+        initButtons();
+        initSpinners();
+        setupActivityListner();
 
-        Button createButton = findViewById(R.id.createTransactionBtn); // manual create
-        Button uploadButton = findViewById(R.id.uploadFileButton); // upload csv
-        Button editTransactionsButton = findViewById(R.id.editTransactions); // edit categories and search transactions button
+    }
 
-        Spinner csvMonthSPinner = findViewById(R.id.csvMonthSPpinner);
-        Spinner csvYearSpinner = findViewById(R.id.csvYearSpinner);
-
-        @SuppressLint("SimpleDateFormat")
-        DateFormat dateFormat= new SimpleDateFormat("MM");
-        Date currentDate = new Date();
-        int currentMonth = Integer.parseInt(dateFormat.format(currentDate)) -1;
-
-
-        // month dropdown adapter
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
-                (this, android.R.layout.simple_spinner_item,
-                        months); //selected item will look like a spinner set from XML
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout
-                .simple_spinner_dropdown_item);
-        csvMonthSPinner.setAdapter(spinnerArrayAdapter);
-
-        // year dropdown adapter
-        ArrayAdapter<String> yearSpinnerAdapter = new ArrayAdapter<String>
-                (this, android.R.layout.simple_spinner_item, DateList.years
-                        ); //selected item will look like a spinner set from XML
-        yearSpinnerAdapter.setDropDownViewResource(android.R.layout
-                .simple_spinner_dropdown_item);
-        csvYearSpinner.setAdapter(yearSpinnerAdapter);
-
-        // set dropdown month  current value
-        csvMonthSPinner.setSelection(currentMonth);
-        selectedMonth = months[currentMonth];
-
-        // set dorpdown year current value
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        selectedYear = year+"";
-        csvYearSpinner.setSelection(1);
-
-        csvMonthSPinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedMonth = months[i];
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        csvYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedYear = DateList.years[i];
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        createButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(ManageTransactionsActivity.this, TransactionActivity.class);
-                i.putExtra("selectedMonth", selectedMonth);
-                i.putExtra("selectedYear", selectedYear);
-                startActivity(i);
-            }
-        });
-
-        editTransactionsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(ManageTransactionsActivity.this, EditTransactionsActivity.class);
-                startActivity(i);
-            }
-        });
-
-        ActivityResultLauncher<Intent> startActivityForResult = this.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+    private void setupActivityListner(){
+        startActivityForResult = this.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if(result.getResultCode() == Activity.RESULT_OK){ //checking if result is ok
                 Intent data = result.getData(); // getting the data from the file
                 Uri contentUri = data.getData(); // getting the file location / uri
@@ -147,9 +74,9 @@ public class ManageTransactionsActivity extends AppCompatActivity {
                     ArrayList<StatementTransaction> transactions = new ArrayList<>();
                     ArrayList<String> lines = new ArrayList<>();
                     for(String line; (line= reader.readLine()) !=null;){ // loop over each line and store in arraylist
-                       lines.add(line);
+                        lines.add(line);
                     }
-                   //
+                    //
                     for(int i=1; i<11;i++){
                         String [] row  =lines.get(i).split(","); //splitting lines
                         String account = row[0]; //out of the row 0 for account value
@@ -175,20 +102,102 @@ public class ManageTransactionsActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 //  Toast.makeText(this, getFilePathFromUri(data), Toast.LENGTH_LONG).show();
-               // csvText.setText(readCSVFile(getFilePathFromUri(data)));
-            }
-        });//first part clicking on upload button - choosing the file - starting the chooser and waiting for result
-        uploadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent chooseFIle = new Intent(Intent.ACTION_GET_CONTENT);
-                chooseFIle.setType("*/*");
-                chooseFIle = Intent.createChooser(chooseFIle, "Choose a file");
-                startActivityForResult.launch(chooseFIle);
+                // csvText.setText(readCSVFile(getFilePathFromUri(data)));
             }
         });
 
+    }
 
+    private void initButtons() {
+        Button createButton = findViewById(R.id.createTransactionBtn); // manual create
+        Button uploadButton = findViewById(R.id.uploadFileButton); // upload csv
+        Button editTransactionsButton = findViewById(R.id.editTransactions); // edit categories and search transactions button
+
+        createButton.setOnClickListener(v -> startTransactionActivity());
+        uploadButton.setOnClickListener(v -> openFileChooser());
+        editTransactionsButton.setOnClickListener(v -> startEditTransactionsActivity());
+    }
+
+    private void startTransactionActivity() {
+        Intent i = new Intent(ManageTransactionsActivity.this, TransactionActivity.class);
+        i.putExtra("selectedMonth", selectedMonth);
+        i.putExtra("selectedYear", selectedYear);
+        startActivity(i);
+    }
+
+    private void openFileChooser(){
+        Intent chooseFIle = new Intent(Intent.ACTION_GET_CONTENT);
+        chooseFIle.setType("*/*");
+        chooseFIle = Intent.createChooser(chooseFIle, "Choose a file");
+        startActivityForResult.launch(chooseFIle);
+    }
+
+    private void startEditTransactionsActivity() {
+        Intent i = new Intent(ManageTransactionsActivity.this, EditTransactionsActivity.class);
+        i.putExtra("selectedYear", selectedYear);
+        startActivity(i);
+    }
+
+    private void initSpinners() {
+        Spinner csvMonthSpinner = findViewById(R.id.csvMonthSPpinner);
+        Spinner csvYearSpinner = findViewById(R.id.csvYearSpinner);
+
+        setMonthSpinner(csvMonthSpinner);
+        setYearSpinner(csvYearSpinner);
+    }
+
+    private void setMonthSpinner(Spinner csvMonthSpinner) {
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                months
+        );
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        csvMonthSpinner.setAdapter(spinnerArrayAdapter);
+
+        @SuppressLint("SimpleDateFormat")
+        DateFormat dateFormat = new SimpleDateFormat("MM");
+        Date currentDate = new Date();
+        int currentMonth = Integer.parseInt(dateFormat.format(currentDate)) - 1;
+        csvMonthSpinner.setSelection(currentMonth);
+        selectedMonth = months[currentMonth];
+
+        csvMonthSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedMonth = months[i];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+    }
+
+    private void setYearSpinner(Spinner csvYearSpinner) {
+        ArrayAdapter<String> yearSpinnerAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                DateList.years
+        );
+        yearSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        csvYearSpinner.setAdapter(yearSpinnerAdapter);
+
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        selectedYear = Integer.toString(year);
+        csvYearSpinner.setSelection(1);
+
+        csvYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedYear = DateList.years[i];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
     }
 
     public float parseFloatOrNull(String value) {
@@ -200,57 +209,7 @@ public class ManageTransactionsActivity extends AppCompatActivity {
     }
 
     public void uploadTransactionsToDB(ArrayList<StatementTransaction> transactions){
-        String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // convert transactions to csv lines
-        ArrayList<String> transactionRows = new ArrayList<>();
-        for(int i=0; i <transactions.size();i++){
-            StatementTransaction t = transactions.get(i);
-            transactionRows.add(t.getCSVstring());
-        }
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-
-        DocumentReference docRef = db.collection("transactions").document(id);
-        Map<String, Object> monthlyTransactions = new HashMap<>();
-
-        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                for(String month: documentSnapshot.getData().keySet()){
-                    List<String> transactionsCSV = (List<String>) documentSnapshot.get(month);
-
-                    ArrayList<String> monthTransaction = new ArrayList<>();
-                    for(int i=0; i<transactionsCSV.size();i++){
-                        monthTransaction.add((transactionsCSV.get(i)));
-                    }
-                    monthlyTransactions.put(month, monthTransaction);
-
-                }
-
-                monthlyTransactions.put(selectedMonth, transactionRows);
-
-                db.collection("transactions").document(id).set(monthlyTransactions).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Toast.makeText(ManageTransactionsActivity.this, "Upload Successful!", Toast.LENGTH_LONG).show();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ManageTransactionsActivity.this, "Upload Failed!", Toast.LENGTH_LONG).show();
-                        e.printStackTrace();
-                    }
-                });
-
-            }
-        });
-
-
-
-
+        FirebaseUtils.addTransactions(selectedMonth,selectedYear,transactions);
 
     }
 

@@ -103,6 +103,7 @@ public class BudgetPlanFragment extends Fragment {
 
             // Create a TextView for the category name and add it to the TableRow
             TextView textView = new TextView(getActivity());
+            textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             textView.setText( Categories.list[i]);
             tableRow.addView(textView);
 

@@ -1,5 +1,7 @@
 package com.example.budgetmanagementcheckpoint1.activities;
 
+import static com.example.budgetmanagementcheckpoint1.utils.DateList.months;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,6 +19,8 @@ import android.widget.Toast;
 
 import com.example.budgetmanagementcheckpoint1.R;
 import com.example.budgetmanagementcheckpoint1.adapters.EditTransactionsAdapter;
+import com.example.budgetmanagementcheckpoint1.utils.DateList;
+import com.example.budgetmanagementcheckpoint1.utils.FirebaseUtils;
 import com.example.budgetmanagementcheckpoint1.utils.StatementTransaction;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -41,21 +45,45 @@ public class EditTransactionsActivity extends AppCompatActivity {
     FirebaseFirestore db;
     String selectedMonth ="";
     EditTransactionsAdapter adapter;
+    ArrayList<StatementTransaction> transactions;
+    Map<String, Map<String, ArrayList<StatementTransaction>>> transactionsData;
+    Spinner monthDropdown;
+    RecyclerView transactionsREcyclerView;
+    String selectedYear = "2023";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_transactions);
 
-        Spinner monthDropdown = findViewById(R.id.monthSpinner);
-        RecyclerView transactionsREcyclerView = findViewById(R.id.transactionsREcyclerView);
+        monthDropdown = findViewById(R.id.monthSpinner);
+        transactionsREcyclerView = findViewById(R.id.transactionsREcyclerView);
         Button saveButton = findViewById(R.id.saveChangesButton);
+
+        selectedYear = getIntent().getStringExtra("selectedYear");
 
         db = FirebaseFirestore.getInstance();
 
-        ArrayList<StatementTransaction> transactions = new ArrayList<>();
+        transactionsData = new HashMap<>();
+        transactions = new ArrayList<>();
 
-        String[] months = {"JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"};
+        // get data from firebase
+        FirebaseUtils.getTransactions(data -> {
+            transactionsData = data;
+            setupDropdowns();
+        });
+
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                uploadTransactionsToDB(transactions);
+
+            }
+        });
+
+    }
+
+    public void setupDropdowns(){
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
                 (this, android.R.layout.simple_spinner_item,
                         months); //selected item will look like a spinner set from XML
@@ -73,38 +101,32 @@ public class EditTransactionsActivity extends AppCompatActivity {
         monthDropdown.setSelection(month);
         selectedMonth = months[month].toLowerCase(Locale.ROOT);
 
+      //  transactions = FirebaseUtils.getTransactionsFrom(selectedMonth, "2023", transactionsData);
+
+        adapter = new EditTransactionsAdapter(transactions, EditTransactionsActivity.this );
+        transactionsREcyclerView.setAdapter(adapter);
+        transactionsREcyclerView.setLayoutManager(new LinearLayoutManager(EditTransactionsActivity.this));
+
         monthDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedMonth = months[i].toLowerCase(Locale.ROOT).toLowerCase(Locale.ROOT);
 
-                String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                DocumentReference docRef = db.collection("transactions").document(userid);
-                docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        List<String> transactionsCSV = (List<String>) documentSnapshot.get(selectedMonth);
-                        if(transactionsCSV == null){
-                            Toast.makeText(EditTransactionsActivity.this,"No data found for this month",Toast.LENGTH_LONG).show();
-                            return;
-                        }
+                if(transactions.size() > 0){
+                    transactions.clear();
+                }
+                ArrayList<StatementTransaction> monthTransactions = FirebaseUtils.getTransactionsFrom(selectedMonth, selectedYear, transactionsData);
 
-                        transactions.clear();
-                        for(int i=0; i<transactionsCSV.size();i++){
-                           // if(transactionsCSV.get(i).getClass().isArray()){
-                                transactions.add(StatementTransaction.parseCSVstring(transactionsCSV.get(i)));
-                           // }else{
-                           //     Toast.makeText(EditTransactionsActivity.this,transactionsCSV.get(i).getClass().getName(),Toast.LENGTH_LONG ).show();
-                               // transactions.add(StatementTransaction.parseData(transactionsCSV.get(i)));
-                        //    }
-                        }
+                if(monthTransactions == null){
+                    Toast.makeText(EditTransactionsActivity.this, "No data found for selected month", Toast.LENGTH_LONG).show();
+                    transactions = new ArrayList<>();
+                }else{
+                    transactions = new ArrayList<>(monthTransactions);
+                }
 
-                        adapter = new EditTransactionsAdapter(transactions, EditTransactionsActivity.this );
-                        transactionsREcyclerView.setAdapter(adapter);
-                        transactionsREcyclerView.setLayoutManager(new LinearLayoutManager(EditTransactionsActivity.this));
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+                adapter = new EditTransactionsAdapter(transactions, EditTransactionsActivity.this );
+                transactionsREcyclerView.setAdapter(adapter);
+                transactionsREcyclerView.setLayoutManager(new LinearLayoutManager(EditTransactionsActivity.this));
             }
 
             @Override
@@ -112,74 +134,78 @@ public class EditTransactionsActivity extends AppCompatActivity {
 
             }
         });
-
-
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                uploadTransactionsToDB(transactions);
-                Toast.makeText(EditTransactionsActivity.this,"Transactions saved!",Toast.LENGTH_LONG).show();
-            }
-        });
-
     }
 
 
     public void uploadTransactionsToDB(ArrayList<StatementTransaction> transactions){
-        String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        @SuppressLint("SimpleDateFormat")
-        DateFormat dateFormat= new SimpleDateFormat("MM");
-        Date date = new Date();
-        String[] months = {"january","february","march","april","may","june","july","august","september","october","november","december"};
-        String currentMonth = months[Integer.parseInt(dateFormat.format(date)) -1];
+        if(transactions.size() == 0) return;
+        Map<String, ArrayList<StatementTransaction>> yearTransactions = transactionsData.get(selectedYear);
+        yearTransactions.put(selectedMonth, transactions);
+        //transactionsData.put(selectedYear, yearTransactions);
 
-
-        // convert transactions to csv lines
-        ArrayList<String> transactionRows = new ArrayList<>();
-        for(int i=0; i <transactions.size();i++){
-            StatementTransaction t = transactions.get(i);
-            transactionRows.add(t.getCSVstring());
-        }
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-
-        DocumentReference docRef = db.collection("transactions").document(id);
-        Map<String, Object> monthlyTransactions = new HashMap<>();
-
-        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        FirebaseUtils.updateTransactions(transactionsData, new OnSuccessListener<Void>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                for(String month: documentSnapshot.getData().keySet()){
-                    List<String> transactionsCSV = (List<String>) documentSnapshot.get(month);
-
-                    ArrayList<String> monthTransaction = new ArrayList<>();
-                    for(int i=0; i<transactionsCSV.size();i++){
-                        monthTransaction.add((transactionsCSV.get(i)));
-                    }
-                    monthlyTransactions.put(month, monthTransaction);
-
-                }
-
-                monthlyTransactions.put(selectedMonth, transactionRows);
-
-                db.collection("transactions").document(id).set(monthlyTransactions).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        adapter.notifyDataSetChanged();
-                        Toast.makeText(EditTransactionsActivity.this, "Upload Successful!", Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(EditTransactionsActivity.this, "Upload Failed!", Toast.LENGTH_LONG).show();
-                        e.printStackTrace();
-                    }
-                });
-
+            public void onSuccess(Void unused) {
+                Toast.makeText(EditTransactionsActivity.this,"Transactions saved!",Toast.LENGTH_LONG).show();
             }
+
         });
+
+//        String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//
+//        @SuppressLint("SimpleDateFormat")
+//        DateFormat dateFormat= new SimpleDateFormat("MM");
+//        Date date = new Date();
+//        String[] months = {"january","february","march","april","may","june","july","august","september","october","november","december"};
+//        String currentMonth = months[Integer.parseInt(dateFormat.format(date)) -1];
+//
+//
+//        // convert transactions to csv lines
+//        ArrayList<String> transactionRows = new ArrayList<>();
+//        for(int i=0; i <transactions.size();i++){
+//            StatementTransaction t = transactions.get(i);
+//            transactionRows.add(t.getCSVstring());
+//        }
+//
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//
+//
+//        DocumentReference docRef = db.collection("transactions").document(id);
+//        Map<String, Object> monthlyTransactions = new HashMap<>();
+//
+//        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(DocumentSnapshot documentSnapshot) {
+//
+//                for(String month: documentSnapshot.getData().keySet()){
+//                    List<String> transactionsCSV = (List<String>) documentSnapshot.get(month);
+//
+//                    ArrayList<String> monthTransaction = new ArrayList<>();
+//                    for(int i=0; i<transactionsCSV.size();i++){
+//                        monthTransaction.add((transactionsCSV.get(i)));
+//                    }
+//                    monthlyTransactions.put(month, monthTransaction);
+//
+//                }
+//
+//                monthlyTransactions.put(selectedMonth, transactionRows);
+//
+//                db.collection("transactions").document(id).set(monthlyTransactions).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void unused) {
+//                        adapter.notifyDataSetChanged();
+//                        Toast.makeText(EditTransactionsActivity.this, "Upload Successful!", Toast.LENGTH_SHORT).show();
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Toast.makeText(EditTransactionsActivity.this, "Upload Failed!", Toast.LENGTH_LONG).show();
+//                        e.printStackTrace();
+//                    }
+//                });
+//
+//            }
+//        });
     }
 }

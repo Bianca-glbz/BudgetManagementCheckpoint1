@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.example.budgetmanagementcheckpoint1.R;
 import com.example.budgetmanagementcheckpoint1.utils.DateList;
+import com.example.budgetmanagementcheckpoint1.utils.FirebaseUtils;
 import com.example.budgetmanagementcheckpoint1.utils.StatementTransaction;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
@@ -81,7 +82,8 @@ public class StatsFragment extends Fragment {
      * @return A new instance of fragment StatsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    Map<String, List<String>> monthlyTransactions;
+    Map<String, Map<String, ArrayList<StatementTransaction>>> transactionsData;
+    Map<String, List<StatementTransaction>> monthlyTransactions;
     ArrayList<StatementTransaction> transactions;
     String selectedMonth, selectedYear;
 
@@ -187,45 +189,31 @@ public class StatsFragment extends Fragment {
     }
 
     public void getData(){
-        String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        DocumentReference docRef = db.collection("transactions").document(id);
-
-        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        FirebaseUtils.getTransactions(new OnSuccessListener<Map<String, Map<String, ArrayList<StatementTransaction>>>>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                for(String month: documentSnapshot.getData().keySet()){
-                    List<String> transactionsCSV = (List<String>) documentSnapshot.get(month);
-
-                    ArrayList<String> monthTransaction = new ArrayList<>();
-                    for(int i=0; i<transactionsCSV.size();i++){
-                        monthTransaction.add((transactionsCSV.get(i)));
-                    }
-
-                    monthlyTransactions.put(month, monthTransaction);
-                }
-
+            public void onSuccess(Map<String, Map<String, ArrayList<StatementTransaction>>> data) {
+                transactionsData = data;
                 refreshChartsWithData();
             }
         });
     }
 
     public void refreshChartsWithData(){
+    if(transactionsData == null) {
+        return;
+    }
+        List<StatementTransaction> currentMonthData =  FirebaseUtils.getTransactionsFrom(selectedMonth, selectedYear, transactionsData);
 
-        List<String> currentMonthCSV =  monthlyTransactions.get(selectedMonth);
-
-        if(currentMonthCSV == null){
+        if(currentMonthData == null){
             Toast.makeText(getContext(),"No data found for selected month.", Toast.LENGTH_LONG).show();
             return;
         }
 
         transactions.clear();
 
-        for(int i=0; i<currentMonthCSV.size();i++){
-            StatementTransaction transaction = StatementTransaction.parseCSVstring(currentMonthCSV.get(i));
-            transactions.add(transaction);
+        for(int i=0; i<currentMonthData.size();i++){
+            transactions.add(currentMonthData.get(i));
         }
 
         calculateStats();
@@ -261,6 +249,7 @@ public class StatsFragment extends Fragment {
 // Create a TextView for the category heading
         TextView categoryHeading = new TextView(getContext());
         categoryHeading.setText("Category");
+        categoryHeading.setTextColor(Color.BLACK);
         categoryHeading.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
                 TableRow.LayoutParams.WRAP_CONTENT, 1f));
         categoryHeading.setTypeface(null, Typeface.BOLD);
@@ -270,6 +259,7 @@ public class StatsFragment extends Fragment {
 // Create a TextView for the amount heading
         TextView amountHeading = new TextView(getContext());
         amountHeading.setText("Amount Spent");
+        amountHeading.setTextColor(Color.BLACK);
         amountHeading.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
                 TableRow.LayoutParams.WRAP_CONTENT, 1f));
         amountHeading.setGravity(Gravity.END);
