@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.budgetmanagementcheckpoint1.R;
 import com.example.budgetmanagementcheckpoint1.utils.Categories;
+import com.example.budgetmanagementcheckpoint1.utils.FirebaseUtils;
 import com.example.budgetmanagementcheckpoint1.utils.StatementTransaction;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -115,54 +116,7 @@ public class TransactionActivity extends AppCompatActivity {
                 StatementTransaction transaction = new StatementTransaction("n/a",dateInput.getText().toString(),descriptionInput.getText().toString(),Float.parseFloat(amountInput.getText().toString()),
                         -1,selectedType,Categories.list[currentCateogry],Integer.parseInt(selectedYear));
 
-                String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                String[] months = {"january","february","march","april","may","june","july","august","september","october","november","december"};
-
-//                @SuppressLint("SimpleDateFormat")
-//                DateFormat dateFormat= new SimpleDateFormat("MM");
-//                Date currentDate = new Date();
-//                String currentMonth = months[Integer.parseInt(dateFormat.format(currentDate)) -1];
-
-
-
-                DocumentReference docRef = db.collection("transactions").document(id);
-                Map<String, Object> monthlyTransactions = new HashMap<>();
-
-                docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                        for(String month: documentSnapshot.getData().keySet()){
-                            List<String> transactionsCSV = (List<String>) documentSnapshot.get(month);
-
-                            ArrayList<String> monthTransaction = new ArrayList<>();
-                            for(int i=0; i<transactionsCSV.size();i++){
-                                monthTransaction.add((transactionsCSV.get(i)));
-                            }
-                            monthlyTransactions.put(month, monthTransaction);
-
-                        }
-
-                        List<String> transactionsCSV = (List<String>) monthlyTransactions.get(selectedMonth);
-                        transactionsCSV.add(0, transaction.getCSVstring());
-                        monthlyTransactions.put(selectedMonth, transactionsCSV);
-
-                        db.collection("transactions").document(id).set(monthlyTransactions).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                Toast.makeText(TransactionActivity.this, "Transaction added!", Toast.LENGTH_LONG).show();
-                                finish();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(TransactionActivity.this, "Upload Failed!", Toast.LENGTH_LONG).show();
-                                e.printStackTrace();
-                            }
-                        });
-
-                    }
-                });
+                FirebaseUtils.addTransaction(selectedMonth, selectedYear, transaction);
 
 
             }

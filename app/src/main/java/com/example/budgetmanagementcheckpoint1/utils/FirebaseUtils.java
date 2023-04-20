@@ -94,12 +94,47 @@ public class FirebaseUtils {
     }
 
 
-    public static void addTransaction(int month, int year, StatementTransaction transaction) {
-        CollectionReference colRef = db.collection(COLLECTION_NAME).document(auth.getUid()).collection(Integer.toString(year)).document(Integer.toString(month)).collection("transactions");
-        colRef.add(transaction.getCSVstring())
-                .addOnSuccessListener(documentReference -> Log.d(TAG, "Transaction added"))
-                .addOnFailureListener(e -> Log.e(TAG, "Error adding transaction", e));
+    public static void addTransaction(String month, String year, StatementTransaction transaction) {
+        DocumentReference docRef = db.collection("transactions").document(auth.getUid());
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Map<String, Object> data = document.getData();
+                    if(data != null && data.containsKey(year)){
+                        Map<String, Object> yearData = (Map<String, Object>) data.get(year);
+                        if(yearData.containsKey(month)){
+                            List<String> monthData = (List<String>) yearData.get(month);
+                            monthData.add(transaction.getCSVstring());
+                            yearData.put(month, monthData);
+                        }else{
+                            List<String> monthData = new ArrayList<>();
+                            monthData.add(transaction.getCSVstring());
+                            yearData.put(month, monthData);
+                        }
+                        data.put(year, yearData);
+                    }else{
+                        Map<String, Object> yearData = new HashMap<>();
+                        List<String> monthData = new ArrayList<>();
+                        monthData.add(transaction.getCSVstring());
+                        yearData.put(month, monthData);
+                        data.put(year, yearData);
+                    }
+                    docRef.set(data);
+                } else {
+                    Map<String, Object> yearData = new HashMap<>();
+                    List<String> monthData = new ArrayList<>();
+                    monthData.add(transaction.getCSVstring());
+                    yearData.put(month, monthData);
+                    Map<String, Object> data = new HashMap<>();
+                    data.put(year, yearData);
+                    docRef.set(data);
+                }
+            }
+        });
     }
+ 
 
     public static void addTransactions(String month, String year, List<StatementTransaction> transactions) {
 
