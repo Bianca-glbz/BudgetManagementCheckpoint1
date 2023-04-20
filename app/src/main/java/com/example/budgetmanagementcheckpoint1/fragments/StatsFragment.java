@@ -242,7 +242,6 @@ public class StatsFragment extends Fragment {
             }
         }
 
-
 // Create a new TableRow for the headings
         TableRow headingsRow = new TableRow(getContext());
 
@@ -347,6 +346,7 @@ public class StatsFragment extends Fragment {
         chart.setTransparentCircleRadius(0f);
         chart.getLegend().setEnabled(true);
         chart.getLegend().setTextSize(10f);
+        chart.getLegend().setWordWrapEnabled(true);
         chart.animateY(1000, Easing.EaseInOutCubic);
 
         float finalTotalDebit = totalDebit;

@@ -196,5 +196,60 @@ public class FirebaseUtils {
     public interface TransactionListener {
         void onTransactionsReceived(ArrayList<String> transactions);
     }
+
+    public static void setBudgetTarget(String month, String year, Map<String, Double> budgetTargets){
+        DocumentReference docRef = db.collection("budgets").document(auth.getUid());
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Map<String, Object> data = document.getData();
+                    if(data != null && data.containsKey(year)){
+                        Map<String, Object> yearData = (Map<String, Object>) data.get(year);
+                        yearData.put(month, budgetTargets);
+                        data.put(year, yearData);
+                    }else{
+                        Map<String, Object> yearData = new HashMap<>();
+                        yearData.put(month, budgetTargets);
+                        data.put(year, yearData);
+                    }
+                    docRef.set(data);
+                } else {
+                    Map<String, Object> yearData = new HashMap<>();
+                    yearData.put(month, budgetTargets);
+                    Map<String, Object> data = new HashMap<>();
+                    data.put(year, yearData);
+                    docRef.set(data);
+                }
+            }
+        });
+    }
+
+    public static void getBudgetTarget(String month, String year, OnSuccessListener<Map<String, Double>> listener){
+        DocumentReference docRef = db.collection("budgets").document(auth.getUid());
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Map<String, Object> data = document.getData();
+                    if(data != null && data.containsKey(year)){
+                        Map<String, Object> yearData = (Map<String, Object>) data.get(year);
+                        if(yearData.containsKey(month)){
+                            Map<String, Double> budgetTargets = (Map<String, Double>) yearData.get(month);
+                            listener.onSuccess(budgetTargets);
+                        }else{
+                            listener.onSuccess(null);
+                        }
+                    }else{
+                        listener.onSuccess(null);
+                    }
+                } else {
+                    listener.onSuccess(null);
+                }
+            }
+        });
+    }
 }
 
