@@ -135,6 +135,7 @@ public class ManageTransactionsActivity extends AppCompatActivity {
     private void startEditTransactionsActivity() {
         Intent i = new Intent(ManageTransactionsActivity.this, EditTransactionsActivity.class);
         i.putExtra("selectedYear", selectedYear);
+        i.putExtra("selectedMonth", selectedMonth);
         startActivity(i);
     }
 
@@ -209,7 +210,9 @@ public class ManageTransactionsActivity extends AppCompatActivity {
     }
 
     public void uploadTransactionsToDB(ArrayList<StatementTransaction> transactions){
-        FirebaseUtils.addTransactions(selectedMonth,selectedYear,transactions);
+        FirebaseUtils.addTransactions(selectedMonth,selectedYear,transactions, ManageTransactionsActivity.this);
+
+
 
     }
 

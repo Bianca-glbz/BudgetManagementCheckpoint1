@@ -1,24 +1,79 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".fragments.SettingsFragment">
+    android:orientation="vertical"
+    android:padding="10dp">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <!-- Title TextView -->
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/background"
-        android:gravity="center">
+        android:layout_height="wrap_content"
+        android:text="Budget Comparison"
+        android:textSize="24sp"
+        android:padding="16dp"
+        android:gravity="center"/>
 
-        <TextView
-            android:layout_width="wrap_content"
+    <!-- Month and Year Spinners -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <Spinner
+            android:id="@+id/month_spinner"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="HELLO"
-            android:textColor="@color/black">
+            android:layout_weight="1"
+            />
 
-        </TextView>
-    </androidx.appcompat.widget.LinearLayoutCompat>
+        <Spinner
+            android:id="@+id/year_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+           />
 
-</FrameLayout>
+    </LinearLayout>
+
+    <!-- Budget Comparison Table -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TableLayout
+            android:id="@+id/budget_comparison_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*"
+            android:padding="16dp">
+
+            <!-- Table Header Row -->
+            <TableRow>
+                <TextView
+                    android:text="Category"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:text="Total Spend"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:text="Target Spend"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:text="Progress"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+            </TableRow>
+
+            <!-- Table Data Rows - Dynamically added later from Java code -->
+
+        </TableLayout>
+
+    </ScrollView>
+
+</LinearLayout>
+

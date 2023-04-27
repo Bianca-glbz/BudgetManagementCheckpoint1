@@ -61,6 +61,7 @@ public class EditTransactionsActivity extends AppCompatActivity {
         Button saveButton = findViewById(R.id.saveChangesButton);
 
         selectedYear = getIntent().getStringExtra("selectedYear");
+        selectedMonth = getIntent().getStringExtra("selectedMonth");
 
         db = FirebaseFirestore.getInstance();
 
@@ -98,8 +99,12 @@ public class EditTransactionsActivity extends AppCompatActivity {
         int month = Integer.parseInt(dateFormat.format(date)) -1;
 
         // use current month as default selection
-        monthDropdown.setSelection(month);
-        selectedMonth = months[month].toLowerCase(Locale.ROOT);
+        
+        if(selectedMonth.equals("")){
+            selectedMonth = months[month].toLowerCase(Locale.ROOT);
+        }
+        int monthNum = Arrays.asList(months).indexOf(selectedMonth);
+        monthDropdown.setSelection(monthNum);
 
       //  transactions = FirebaseUtils.getTransactionsFrom(selectedMonth, "2023", transactionsData);
 

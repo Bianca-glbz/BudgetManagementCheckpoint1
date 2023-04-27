@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.budgetmanagementcheckpoint1.R;
 import com.example.budgetmanagementcheckpoint1.utils.Categories;
+import com.example.budgetmanagementcheckpoint1.utils.DateList;
 import com.example.budgetmanagementcheckpoint1.utils.FirebaseUtils;
 import com.example.budgetmanagementcheckpoint1.utils.StatementTransaction;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -40,6 +42,8 @@ public class TransactionActivity extends AppCompatActivity {
     FirebaseFirestore db;
     int selectedType = 0;
     int currentCateogry = Arrays.asList(Categories.list).indexOf(0);
+    String selectedMonth;
+    String selectedYear;
 
 
     @Override
@@ -49,8 +53,8 @@ public class TransactionActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        String selectedMonth = getIntent().getStringExtra("selectedMonth");
-        String selectedYear = getIntent().getStringExtra("selectedYear");
+         selectedMonth = getIntent().getStringExtra("selectedMonth");
+         selectedYear = getIntent().getStringExtra("selectedYear");
 
         //transaction added manually
         EditText descriptionInput = findViewById(R.id.descriptionInput);
@@ -80,6 +84,17 @@ public class TransactionActivity extends AppCompatActivity {
 
             }
         });
+
+    // get month num by finding the selected month index in the list
+        int monthNum = 0;
+        for (int i = 0; i < DateList.months.length; i++) {
+            if (DateList.months[i].equals(selectedMonth)) {
+                monthNum = i+1;
+                break;
+            }
+        }
+
+        dateInput.setText("1/" + monthNum + "/" + selectedYear);
 
         // category dropdown
 
@@ -116,8 +131,11 @@ public class TransactionActivity extends AppCompatActivity {
                 StatementTransaction transaction = new StatementTransaction("n/a",dateInput.getText().toString(),descriptionInput.getText().toString(),Float.parseFloat(amountInput.getText().toString()),
                         -1,selectedType,Categories.list[currentCateogry],Integer.parseInt(selectedYear));
 
-                FirebaseUtils.addTransaction(selectedMonth, selectedYear, transaction);
-
+                FirebaseUtils.addTransaction(selectedMonth, selectedYear, transaction, TransactionActivity.this);
+                Intent i = new Intent(TransactionActivity.this, EditTransactionsActivity.class);
+                i.putExtra("selectedYear", selectedYear);
+                i.putExtra("selectedMonth", selectedMonth);
+                startActivity(i);
 
             }
         });

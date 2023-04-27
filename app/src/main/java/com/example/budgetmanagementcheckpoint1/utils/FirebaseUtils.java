@@ -1,6 +1,8 @@
 package com.example.budgetmanagementcheckpoint1.utils;
 
+import android.app.Activity;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -94,11 +96,12 @@ public class FirebaseUtils {
     }
 
 
-    public static void addTransaction(String month, String year, StatementTransaction transaction) {
+    public static void addTransaction(String month, String year, StatementTransaction transaction, Activity activity) {
         DocumentReference docRef = db.collection("transactions").document(auth.getUid());
 
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                Toast.makeText(activity,"Added successfully!", Toast.LENGTH_LONG).show();
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
                     Map<String, Object> data = document.getData();
@@ -131,18 +134,26 @@ public class FirebaseUtils {
                     data.put(year, yearData);
                     docRef.set(data);
                 }
+                Log.e("FIREBASE //", "WORKING");
+            }else{
+                Log.e("FIREBASE //", task
+                        .getException().toString());
+                Toast.makeText(activity,"Error adding transaction!", Toast.LENGTH_LONG).show();
+
             }
         });
     }
  
 
-    public static void addTransactions(String month, String year, List<StatementTransaction> transactions) {
+    public static void addTransactions(String month, String year, List<StatementTransaction> transactions, Activity activity) {
 
         DocumentReference docRef = db.collection("transactions").document(auth.getUid());
 
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
+                Toast.makeText(activity,"Transactions added!", Toast.LENGTH_LONG).show();
+
                 if (document.exists()) {
                     Map<String, Object> data = document.getData();
                     if(data != null && data.containsKey(year)){
@@ -182,6 +193,11 @@ public class FirebaseUtils {
                     data.put(year, yearData);
                     docRef.set(data);
                 }
+            }else{
+                Log.e("FIREBASE //", task
+                        .getException().toString());
+                Toast.makeText(activity,"Error adding transactions!", Toast.LENGTH_LONG).show();
+
             }
         });
     }

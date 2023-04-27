@@ -9,9 +9,9 @@ import android.os.Bundle;
 
 import com.example.budgetmanagementcheckpoint1.databinding.ActivityMenuBinding;
 import com.example.budgetmanagementcheckpoint1.fragments.HomeFragment;
-import com.example.budgetmanagementcheckpoint1.fragments.PersonFragment;
+import com.example.budgetmanagementcheckpoint1.fragments.BudgetStatementFragment;
 import com.example.budgetmanagementcheckpoint1.fragments.BudgetPlanFragment;
-import com.example.budgetmanagementcheckpoint1.fragments.SettingsFragment;
+import com.example.budgetmanagementcheckpoint1.fragments.ComparisonsFragment;
 import com.example.budgetmanagementcheckpoint1.fragments.StatsFragment;
 
 public class Menu extends AppCompatActivity {
@@ -33,14 +33,14 @@ public class Menu extends AppCompatActivity {
               case R.id.home:
                   replaceFragment( new HomeFragment());
                   break;
-              case R.id.person:
-                  replaceFragment( new PersonFragment());
+              case R.id.budgetStatement:
+                  replaceFragment( new BudgetStatementFragment());
                   break;
               case R.id.budgetPlan:
                   replaceFragment( new BudgetPlanFragment());
                   break;
-              case R.id.settings:
-                  replaceFragment( new SettingsFragment());
+              case R.id.comparison:
+                  replaceFragment( new ComparisonsFragment());
                   break;
               case R.id.stats:
                   replaceFragment( new StatsFragment());

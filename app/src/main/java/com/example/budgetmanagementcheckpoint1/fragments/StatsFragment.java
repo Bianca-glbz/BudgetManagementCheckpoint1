@@ -30,6 +30,7 @@ import com.example.budgetmanagementcheckpoint1.utils.FirebaseUtils;
 import com.example.budgetmanagementcheckpoint1.utils.StatementTransaction;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -205,12 +206,16 @@ public class StatsFragment extends Fragment {
     }
         List<StatementTransaction> currentMonthData =  FirebaseUtils.getTransactionsFrom(selectedMonth, selectedYear, transactionsData);
 
+        transactions.clear();
+
         if(currentMonthData == null){
-            Toast.makeText(getContext(),"No data found for selected month.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(),"No data found for the selection.", Toast.LENGTH_LONG).show();
+            calculateStats();
+            showTable();
             return;
         }
 
-        transactions.clear();
+        
 
         for(int i=0; i<currentMonthData.size();i++){
             transactions.add(currentMonthData.get(i));
@@ -328,26 +333,42 @@ public class StatsFragment extends Fragment {
             entries.add(new PieEntry(percentage, label));
         }
 
-        // Set up the PieDataSet and PieData
-        PieDataSet dataSet = new PieDataSet(entries, "Debit Distribution by Category");
-        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
-        dataSet.setValueTextSize(12f);
-        dataSet.setValueTextColor(Color.WHITE);
-        dataSet.setValueFormatter(new PercentFormatter());
-        dataSet.setDrawValues(false);
-        dataSet.setLabel("");
+       // Set up the PieDataSet and PieData
+PieDataSet dataSet = new PieDataSet(entries, "Debit Distribution by Category");
+dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+dataSet.setValueTextSize(12f);
+dataSet.setValueTextColor(Color.WHITE);
+dataSet.setValueFormatter(new PercentFormatter());
+dataSet.setDrawValues(false);
+dataSet.setLabel("");
 
-        PieData data = new PieData(dataSet);
-        chart.setData(data);
+PieData data = new PieData(dataSet);
+chart.setData(data);
 
-        // Customize the chart appearance and enable the legend
-        chart.getDescription().setEnabled(false);
-        chart.setHoleRadius(0f);
-        chart.setTransparentCircleRadius(0f);
-        chart.getLegend().setEnabled(true);
-        chart.getLegend().setTextSize(10f);
-        chart.getLegend().setWordWrapEnabled(true);
-        chart.animateY(1000, Easing.EaseInOutCubic);
+// Customize the chart appearance and enable the legend
+chart.getDescription().setEnabled(false);
+chart.setHoleRadius(0f);
+chart.setTransparentCircleRadius(0f);
+chart.animateY(1000, Easing.EaseInOutCubic);
+
+// Set the visibility of the PieChart to VISIBLE
+chart.setVisibility(View.VISIBLE);
+
+// Add a Legend to the PieChart
+Legend legend = chart.getLegend();
+legend.setForm(Legend.LegendForm.SQUARE);
+legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+legend.setDrawInside(false);
+legend.setWordWrapEnabled(true);
+legend.setXEntrySpace(10f);
+legend.setYEntrySpace(10f);
+legend.setYOffset(2f);
+legend.setTextSize(14f);
+legend.setMaxSizePercent(0.4f);
+
+
 
         float finalTotalDebit = totalDebit;
         chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {

@@ -6,17 +6,17 @@
         android:icon="@drawable/ic_baseline_home_24"
         android:id="@+id/home"/>
     <item
-        android:title="Profile"
-        android:icon="@drawable/ic_baseline_person_24"
-        android:id="@+id/person"/>
+        android:title="Budget Statement"
+        android:icon="@drawable/ic_baseline_edit_calendar_24"
+        android:id="@+id/budgetStatement"/>
     <item
         android:title="Budget Plan"
         android:icon="@drawable/ic_money"
         android:id="@+id/budgetPlan"/>
     <item
-        android:title="Settings"
-        android:icon="@drawable/ic_baseline_settings_24"
-        android:id="@+id/settings"/>
+        android:title="Comparison"
+        android:icon="@drawable/ic_baseline_compare_24"
+        android:id="@+id/comparison"/>
     <item
         android:title="Stats"
         android:icon="@drawable/ic_baseline_bar_chart_24"
