@@ -162,6 +162,8 @@ public class StatsFragment extends Fragment {
         selectedYear = year+"";
         csvYearSpinner.setSelection(1);
 
+        refreshChartsWithData();
+
         csvMonthSPinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -378,10 +380,10 @@ legend.setMaxSizePercent(0.4f);
                 if (entry instanceof PieEntry) {
                     PieEntry pieEntry = (PieEntry) entry;
                     String label = pieEntry.getLabel();
-                    float value = pieEntry.getValue();
-                    float percentage = value / finalTotalDebit * 100f;
-                    String message = String.format("%s: €%.2f (%.1f%%)", label, value, percentage*100);
-                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Float debit = ((PieEntry) entry).getValue();
+                    float percentage = (debit / finalTotalDebit) * 100f;
+                    String message = String.format("%s: €%.2f (%.1f%%)", label, debit, percentage*100);
+                   // Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                 }
             }
 

@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -50,12 +51,14 @@ public class EditTransactionsActivity extends AppCompatActivity {
     Spinner monthDropdown;
     RecyclerView transactionsREcyclerView;
     String selectedYear = "2023";
+    SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_transactions);
 
+        searchView = findViewById(R.id.searchView2);
         monthDropdown = findViewById(R.id.monthSpinner);
         transactionsREcyclerView = findViewById(R.id.transactionsREcyclerView);
         Button saveButton = findViewById(R.id.saveChangesButton);
@@ -82,7 +85,42 @@ public class EditTransactionsActivity extends AppCompatActivity {
             }
         });
 
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filterTransactions(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterTransactions(newText);
+                return false;
+            }
+        });
+
     }
+
+    private void filterTransactions(String query) {
+
+        if(query.equals("")){
+                adapter = new EditTransactionsAdapter(transactions, EditTransactionsActivity.this );
+                transactionsREcyclerView.setAdapter(adapter);
+                transactionsREcyclerView.setLayoutManager(new LinearLayoutManager(EditTransactionsActivity.this));
+            return;
+        }
+    ArrayList<StatementTransaction> filteredTransactions = new ArrayList<>();
+    for (StatementTransaction transaction : transactions) {
+        if (transaction.getDescription().toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT))) {
+            filteredTransactions.add(transaction);
+        }
+    }
+
+     adapter = new EditTransactionsAdapter(filteredTransactions, EditTransactionsActivity.this );
+                transactionsREcyclerView.setAdapter(adapter);
+                transactionsREcyclerView.setLayoutManager(new LinearLayoutManager(EditTransactionsActivity.this));
+    //adapter.filterList(filteredTransactions);
+}
 
     public void setupDropdowns(){
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
@@ -157,60 +195,5 @@ public class EditTransactionsActivity extends AppCompatActivity {
 
         });
 
-//        String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//
-//        @SuppressLint("SimpleDateFormat")
-//        DateFormat dateFormat= new SimpleDateFormat("MM");
-//        Date date = new Date();
-//        String[] months = {"january","february","march","april","may","june","july","august","september","october","november","december"};
-//        String currentMonth = months[Integer.parseInt(dateFormat.format(date)) -1];
-//
-//
-//        // convert transactions to csv lines
-//        ArrayList<String> transactionRows = new ArrayList<>();
-//        for(int i=0; i <transactions.size();i++){
-//            StatementTransaction t = transactions.get(i);
-//            transactionRows.add(t.getCSVstring());
-//        }
-//
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//
-//
-//        DocumentReference docRef = db.collection("transactions").document(id);
-//        Map<String, Object> monthlyTransactions = new HashMap<>();
-//
-//        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//
-//                for(String month: documentSnapshot.getData().keySet()){
-//                    List<String> transactionsCSV = (List<String>) documentSnapshot.get(month);
-//
-//                    ArrayList<String> monthTransaction = new ArrayList<>();
-//                    for(int i=0; i<transactionsCSV.size();i++){
-//                        monthTransaction.add((transactionsCSV.get(i)));
-//                    }
-//                    monthlyTransactions.put(month, monthTransaction);
-//
-//                }
-//
-//                monthlyTransactions.put(selectedMonth, transactionRows);
-//
-//                db.collection("transactions").document(id).set(monthlyTransactions).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                    @Override
-//                    public void onSuccess(Void unused) {
-//                        adapter.notifyDataSetChanged();
-//                        Toast.makeText(EditTransactionsActivity.this, "Upload Successful!", Toast.LENGTH_SHORT).show();
-//                    }
-//                }).addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Toast.makeText(EditTransactionsActivity.this, "Upload Failed!", Toast.LENGTH_LONG).show();
-//                        e.printStackTrace();
-//                    }
-//                });
-//
-//            }
-//        });
     }
 }

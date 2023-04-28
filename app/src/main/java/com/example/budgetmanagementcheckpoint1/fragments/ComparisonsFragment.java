@@ -1,26 +1,51 @@
 package com.example.budgetmanagementcheckpoint1.fragments;
 
+import static com.example.budgetmanagementcheckpoint1.utils.DateList.months;
+
+import android.annotation.SuppressLint;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.budgetmanagementcheckpoint1.R;
+import com.example.budgetmanagementcheckpoint1.utils.Categories;
 import com.example.budgetmanagementcheckpoint1.utils.DateList;
+import com.example.budgetmanagementcheckpoint1.utils.FirebaseUtils;
 import com.example.budgetmanagementcheckpoint1.utils.StatementTransaction;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
@@ -39,6 +64,10 @@ public class ComparisonsFragment extends Fragment {
 
     private String selectedMonth;
     private String selectedYear;
+
+private TextView messageView;
+
+     private BarChart barChart;
 
     private Map<String, Double> budgetTargets;
     private Map<String, Map<String, ArrayList<StatementTransaction>>> transactions;
@@ -84,22 +113,19 @@ public class ComparisonsFragment extends Fragment {
         }
     }
 
-    // @Override
-    // public View onCreateView(LayoutInflater inflater, ViewGroup container,
-    //                          Bundle savedInstanceState) {
-    //     // Inflate the layout for this fragment
-    //     return inflater.inflate(R.layout.fragment_settings, container, false);
-    // }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
+         barChart = view.findViewById(R.id.bar_chart);
         monthSpinner = view.findViewById(R.id.month_spinner);
         yearSpinner = view.findViewById(R.id.year_spinner);
         tableLayout = view.findViewById(R.id.budget_comparison_table);
 
-        ArrayAdapter<String> monthAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, DateList.months);
+        messageView = view.findViewById(R.id.messageView);
+
+        ArrayAdapter<String> monthAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, months);
         monthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         monthSpinner.setAdapter(monthAdapter);
 
@@ -107,37 +133,162 @@ public class ComparisonsFragment extends Fragment {
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         yearSpinner.setAdapter(yearAdapter);
 
-//        Button submitButton = view.findViewById(R.id.);
-//        submitButton.setOnClickListener(v -> {
-//            selectedMonth = monthSpinner.getSelectedItem().toString();
-//            selectedYear = yearSpinner.getSelectedItem().toString();
-//
-//            getBudgetTarget(selectedMonth, selectedYear, new OnSuccessListener<Map<String, Double>>() {
-//                @Override
-//                public void onSuccess(Map<String, Double> map) {
-//                    budgetTargets = map;
-//                    updateTable();
-//                }
-//            });
-//
-//            getTransactions(new OnSuccessListener<Map<String, Map<String, ArrayList<StatementTransaction>>>>() {
-//                @Override
-//                public void onSuccess(Map<String, Map<String, ArrayList<StatementTransaction>>> map) {
-//                    transactions = map;
-//                    updateTable();
-//                }
-//            });
-//        });
+        // selectedMonth = "april";
+        // selectedYear = "2023";
+
+        @SuppressLint("SimpleDateFormat")
+        DateFormat dateFormat= new SimpleDateFormat("MM");
+        Date currentDate = new Date();
+        int currentMonth = Integer.parseInt(dateFormat.format(currentDate)) -1;
+
+        // set dropdown month  current value
+        monthSpinner.setSelection(currentMonth);
+        selectedMonth = months[currentMonth];
+
+        // set dropdown year current value
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        selectedYear = year+"";
+        yearSpinner.setSelection(1);
+
+         monthSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedMonth = months[i];
+                getBudgetData();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        yearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedYear = DateList.years[i];
+                getBudgetData();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+            FirebaseUtils.getTransactions(new OnSuccessListener<Map<String, Map<String, ArrayList<StatementTransaction>>>>() {
+                @Override
+                public void onSuccess(Map<String, Map<String, ArrayList<StatementTransaction>>> stringMapMap) {
+
+                    transactions = stringMapMap;
+                    updateTable();
+                
+                }
+            });
+
+        getBudgetData();
 
         return view;
     }
 
+    private void getBudgetData(){
+        FirebaseUtils.getBudgetTarget(selectedMonth, selectedYear, new OnSuccessListener<Map<String, Double>>() {
+            @Override
+            public void onSuccess(Map<String, Double> stringDoubleMap) {
+                budgetTargets = stringDoubleMap;
+                updateTable();
+            }
+        });
+    }
+
+    private void updateMessage(){
+
+
+            double totalSpent = 0;
+            double totalTarget = 0;
+            for (Map.Entry<String, Double> entry : budgetTargets.entrySet()) {
+                String category = entry.getKey();
+                double target = entry.getValue();
+                totalTarget += target;
+                
+                if(transactions == null) {
+                    Toast.makeText(getContext(), "No transactions found for the selection", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
+                Map<String, ArrayList<StatementTransaction>> yearData = transactions.get(selectedYear);
+                    if (yearData != null) {
+                        ArrayList<StatementTransaction> transactionsList = yearData.get(selectedMonth);
+                        if (transactionsList != null) {
+                            for (StatementTransaction transaction : transactionsList) {
+                                if (transaction.getCategory().equals(category)) {
+                                    totalSpent += transaction.getDebitAmount();
+                                }
+                            }
+                        }
+                    }
+
+            }
+
+
+            
+
+            String message;
+            if (totalSpent > totalTarget) {
+                double overshootPercentage = (totalSpent - totalTarget) / totalTarget * 100;
+                message =String.format(Locale.US, "Total Spent = %.2f", totalSpent) +
+                        "\nBudget Target = " + totalTarget +
+                        "\nYou overshot the budget by " + String.format(Locale.US, "%.2f", overshootPercentage) + "%!";
+            } else {
+                double remainingPercentage = (totalTarget - totalSpent) / totalTarget * 100;
+                message = String.format(Locale.US, "Total Spent = %.2f", totalSpent) + 
+                        "\nBudget Target = " + totalTarget +
+                        "\nYou are " + String.format(Locale.US, "%.2f", remainingPercentage) + "% away from reaching your total budget target!";
+            }
+
+            messageView.setText(message);
+
+    }
+
     private void updateTable() {
+
         if (budgetTargets == null || transactions == null) {
             return;
         }
+        updateMessage();
 
         tableLayout.removeAllViews();
+
+        // Create a new TableRow
+TableRow headerRow = new TableRow(getContext());
+
+        // Create TextViews for each column and add them to the TableRow
+        TextView categoryTextView = new TextView(getContext());
+        categoryTextView.setText("Category");
+        categoryTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        categoryTextView.setTypeface(null, Typeface.BOLD);
+        categoryTextView.setTextColor(Color.parseColor("#000000"));
+        headerRow.addView(categoryTextView);
+
+        TextView totalSpendTextView = new TextView(getContext());
+        totalSpendTextView.setText("Actual");
+        totalSpendTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        totalSpendTextView.setTypeface(null, Typeface.BOLD);
+        totalSpendTextView.setTextColor(Color.parseColor("#000000"));
+        headerRow.addView(totalSpendTextView);
+
+        TextView targetSpendTextView = new TextView(getContext());
+        targetSpendTextView.setText("Target");
+        targetSpendTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        targetSpendTextView.setTypeface(null, Typeface.BOLD);
+        targetSpendTextView.setTextColor(Color.parseColor("#000000"));
+        headerRow.addView(targetSpendTextView);
+
+        // Add the TableRow to the TableLayout as the first row
+        tableLayout.addView(headerRow, 0);
 
         for (Map.Entry<String, Double> entry : budgetTargets.entrySet()) {
             String category = entry.getKey();
@@ -160,25 +311,130 @@ public class ComparisonsFragment extends Fragment {
             TextView categoryView = new TextView(getContext());
             TextView actualView = new TextView(getContext());
             TextView targetView = new TextView(getContext());
-            TextView progressView = new TextView(getContext());
 
             categoryView.setText(category);
             actualView.setText(String.format(Locale.getDefault(), "%.2f", actualAmount));
             targetView.setText(String.format(Locale.getDefault(), "%.2f", targetAmount));
 
-            double progress = actualAmount / targetAmount * 100;
-            progressView.setText(String.format(Locale.getDefault(), "%.2f%%", progress));
-            if (progress >= 100)
-                progressView.setTextColor(ContextCompat.getColor(getContext(), com.google.android.material.R.color.design_default_color_on_primary));
-            else {
-                progressView.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_500));
-            }
-
             row.addView(categoryView);
             row.addView(actualView);
             row.addView(targetView);
-            row.addView(progressView);
             tableLayout.addView(row);
         }
+        loadBarchChart();
+        barChart.performClick();
     }
+    
+
+    public void loadBarchChart() {
+
+
+        // Create the BarDataSet for actual spend
+        BarDataSet actualDataSet = new BarDataSet(new ArrayList<>(), "Actual");
+        actualDataSet.setColor(Color.GREEN);
+
+        // Create the BarDataSet for target spend
+        BarDataSet targetDataSet = new BarDataSet(new ArrayList<>(), "Target");
+        targetDataSet.setColor(Color.RED);
+
+        // Add entries to each BarDataSet
+        ArrayList<String> categories = new ArrayList<>();
+        int i = 0;
+        for (Map.Entry<String, Double> entry : budgetTargets.entrySet()) {
+            String category = entry.getKey();
+            Double targetAmount = entry.getValue();
+            Double actualAmount = 0.0;
+
+            Map<String, ArrayList<StatementTransaction>> yearData = transactions.get(selectedYear);
+            if (yearData != null) {
+                ArrayList<StatementTransaction> transactionsList = yearData.get(selectedMonth);
+                if (transactionsList != null) {
+                    for (StatementTransaction transaction : transactionsList) {
+                        if (transaction.getCategory().equals(category)) {
+                            actualAmount += transaction.getDebitAmount();
+                        }
+                    }
+                }
+            }
+
+            categories.add(category);
+            actualDataSet.addEntry(new BarEntry(i, actualAmount.floatValue()));
+            targetDataSet.addEntry(new BarEntry(i, targetAmount.floatValue()));
+            i++;
+        }
+
+        // Create the BarData with the two BarDataSet objects
+        BarData barData = new BarData(actualDataSet, targetDataSet);
+
+        // Set the BarData to the BarChart
+        barChart.setData(barData);
+
+         // Customize the X-axis labels
+    // XAxis xAxis = barChart.getXAxis();
+    // xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+    // xAxis.setDrawGridLines(false);
+    // xAxis.setDrawAxisLine(true);
+    // xAxis.setGranularity(10f);
+    // xAxis.setCenterAxisLabels(true);
+    // xAxis.setLabelCount(categories.size());
+    // xAxis.setValueFormatter(new IndexAxisValueFormatter(categories));
+
+    // Customize the gap between the bar chart groups (categories)
+    float barWidth = 1.4f;
+    float groupSpace = 0.5f;
+    float barSpace = 0.05f;
+    barData.setBarWidth(barWidth);
+    barChart.getXAxis().setAxisMinimum(0);
+    barChart.getXAxis().setAxisMaximum(0 + barChart.getBarData().getGroupWidth(groupSpace, barSpace) * (categories.size()));
+    barChart.getAxisLeft().setAxisMinimum(0);
+    barChart.groupBars(0, groupSpace, barSpace);
+
+    // Show category labels below each group of bars
+    barChart.getXAxis().setGranularity(2f);
+
+
+        
+
+        // Show category labels below each group of bars
+       // barChart.getXAxis().setAxisMinimum(categories.size());
+//        barChart.getXAxis().setGranularityEnabled(true);
+//        barChart.getXAxis().setGranularity(5.0f);
+//
+//        barChart.highlightValues(null);
+//        barChart.invalidate();
+//        barChart.animateY(1000);
+
+        // Customize the legend
+        Legend legend = barChart.getLegend();
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setDrawInside(false);
+        legend.setFormSize(8f);
+        legend.setXEntrySpace(4f);
+        legend.setYEntrySpace(0f);
+        legend.setWordWrapEnabled(true);
+
+        // Set the description text and disable the description
+            Description description = new Description();
+            description.setText("");
+            barChart.setDescription(description);
+            barChart.getDescription().setEnabled(false);
+
+            // Set the touch events
+            barChart.setTouchEnabled(true);
+            barChart.setDragEnabled(true);
+            barChart.setScaleEnabled(true);
+            barChart.setPinchZoom(false);
+
+            // Set the background color
+            barChart.setBackgroundColor(Color.WHITE);
+
+            // Invalidate the chart to redraw it
+            barChart.invalidate();
+
+            // Animate the chart
+            barChart.animateY(1000);
+        }
+
 }

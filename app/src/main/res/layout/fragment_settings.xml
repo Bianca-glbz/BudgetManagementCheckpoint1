@@ -37,15 +37,35 @@
 
     </LinearLayout>
 
-    <!-- Budget Comparison Table -->
+    
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+          
+        <TextView
+        android:id="@+id/messageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="total spent"
+        android:textSize="14sp"
+        android:textStyle="bold"/>
+
+       <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/bar_chart"
+            android:layout_width="match_parent"
+            android:layout_height="350dp" />
 
         <TableLayout
             android:id="@+id/budget_comparison_table"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:stretchColumns="*"
             android:padding="16dp">
 
@@ -53,26 +73,21 @@
             <TableRow>
                 <TextView
                     android:text="Category"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"/>
                 <TextView
-                    android:text="Total Spend"
-                    android:textSize="18sp"
+                    android:text="Actual"
+                    android:textSize="14sp"
                     android:textStyle="bold"/>
                 <TextView
-                    android:text="Target Spend"
-                    android:textSize="18sp"
+                    android:text="Target"
+                    android:textSize="14sp"
                     android:textStyle="bold"/>
-                <TextView
-                    android:text="Progress"
-                    android:textSize="18sp"
-                    android:textStyle="bold"/>
+              
             </TableRow>
 
-            <!-- Table Data Rows - Dynamically added later from Java code -->
-
         </TableLayout>
-
+  </LinearLayout>
     </ScrollView>
 
 </LinearLayout>

@@ -29,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -36,6 +37,8 @@ import java.util.List;
     public class EditTransactionsAdapter extends RecyclerView.Adapter<EditTransactionsAdapter.RecipestViewHolder> {
         private List<StatementTransaction> transactions;
         private  Activity activity;
+        private ArrayList<StatementTransaction> filteredTransactions;
+
 
         // the view holder for each item with the title, image and like button
         public class RecipestViewHolder extends RecyclerView.ViewHolder {
@@ -53,9 +56,18 @@ import java.util.List;
             }
         }
 
+
+
         public EditTransactionsAdapter(List<StatementTransaction> list, Activity activity) {
             this.transactions = list;
             this.activity = activity;
+            this.filteredTransactions = new ArrayList<>(transactions);
+
+        }
+
+          public void filterList(ArrayList<StatementTransaction> filteredTransactions) {
+            this.filteredTransactions = filteredTransactions;
+            notifyDataSetChanged();
         }
 
         @Override

@@ -6,10 +6,6 @@
         android:icon="@drawable/ic_baseline_home_24"
         android:id="@+id/home"/>
     <item
-        android:title="Budget Statement"
-        android:icon="@drawable/ic_baseline_edit_calendar_24"
-        android:id="@+id/budgetStatement"/>
-    <item
         android:title="Budget Plan"
         android:icon="@drawable/ic_money"
         android:id="@+id/budgetPlan"/>

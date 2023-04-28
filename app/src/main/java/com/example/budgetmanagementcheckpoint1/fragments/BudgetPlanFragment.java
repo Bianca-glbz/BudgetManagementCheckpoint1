@@ -304,62 +304,65 @@ public class BudgetPlanFragment extends Fragment {
 
     }
 
-    private void drawChart(Map<String, Double> categoryData) {
-        ArrayList<BarEntry> barEntries = new ArrayList<>();
+   private void drawChart(Map<String, Double> categoryData) {
+    ArrayList<BarEntry> barEntries = new ArrayList<>();
 
-        int i = 0;
-        for (Map.Entry<String, Double> entry : categoryData.entrySet()) {
-            barEntries.add(new BarEntry(i++, entry.getValue().floatValue()));
-        }
-
-        // Create a BarDataSet from the BarEntry ArrayList
-        BarDataSet barDataSet = new BarDataSet(barEntries, "Category Expenditure");
-
-        // Set colors for each bar
-        barDataSet.setColors(ColorTemplate.JOYFUL_COLORS);
-
-        // Create a BarData object from the BarDataSet and set it to the BarChart
-        BarData barData = new BarData(barDataSet);
-        barChart. setData(barData);
-
-        // Set additional settings for the BarChart
-        barChart.getDescription().setEnabled(false);
-        barChart.setDrawValueAboveBar(true);
-        barChart.setPinchZoom(false);
-        barChart.setDrawBarShadow(false);
-        barChart.setDrawGridBackground(false);
-        barChart.getAxisLeft().setAxisMinimum(0f);
-        barChart.getAxisLeft().setGranularity(1f);
-        barChart.getXAxis().setGranularity(1f);
-        barChart.getXAxis().setDrawGridLines(false);
-        barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        barChart.animateY(1000);
-
-        // Set the visibility of the BarChart to VISIBLE
-        barChart.setVisibility(View.VISIBLE);
-
-        // show the legend below it as a table
-        
-        // Add a Legend to the BarChart
-        Legend legend = barChart.getLegend();
-        legend.setForm(Legend.LegendForm.SQUARE);
-        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
-        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
-        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        legend.setDrawInside(false);
-        legend.setWordWrapEnabled(true);
-        legend.setXEntrySpace(10f);
-        legend.setYEntrySpace(10f);
-        legend.setYOffset(2f);
-        legend.setTextSize(14f);
-
-        // Set the label text for each LegendEntry based on the categoryData HashMap
-        ArrayList<LegendEntry> legendEntries = new ArrayList<>();
-        for (Map.Entry<String, Double> entry : categoryData.entrySet()) {
-            legendEntries.add(new LegendEntry(entry.getKey(), Legend.LegendForm.SQUARE, 10f, 2f, null, barDataSet.getColor(i)));
-            i++;
-        }
-        legend.setCustom(legendEntries);
-
+    int i = 0;
+    for (Map.Entry<String, Double> entry : categoryData.entrySet()) {
+        barEntries.add(new BarEntry(i++, entry.getValue().floatValue()));
     }
+
+    // Create a BarDataSet from the BarEntry ArrayList
+    BarDataSet barDataSet = new BarDataSet(barEntries, "Category Expenditure");
+
+    // Set colors for each bar
+    int[] colors = ColorTemplate.JOYFUL_COLORS;
+    for (i = 0; i < barEntries.size(); i++) {
+        barDataSet.addColor(colors[i % colors.length]);
+    }
+
+    // Create a BarData object from the BarDataSet and set it to the BarChart
+    BarData barData = new BarData(barDataSet);
+    barChart.setData(barData);
+
+    // Set additional settings for the BarChart
+    barChart.getDescription().setEnabled(false);
+    barChart.setDrawValueAboveBar(true);
+    barChart.setPinchZoom(false);
+    barChart.setDrawBarShadow(false);
+    barChart.setDrawGridBackground(false);
+    barChart.getAxisLeft().setAxisMinimum(0f);
+    barChart.getAxisLeft().setGranularity(1f);
+    barChart.getXAxis().setGranularity(1f);
+    barChart.getXAxis().setDrawGridLines(false);
+    barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+    barChart.animateY(1000);
+
+    // Set the visibility of the BarChart to VISIBLE
+    barChart.setVisibility(View.VISIBLE);
+
+    // Add a Legend to the BarChart
+    Legend legend = barChart.getLegend();
+    legend.setForm(Legend.LegendForm.SQUARE);
+    legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+    legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+    legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+    legend.setDrawInside(false);
+    legend.setWordWrapEnabled(true);
+    legend.setXEntrySpace(10f);
+    legend.setYEntrySpace(10f);
+    legend.setYOffset(2f);
+    legend.setTextSize(14f);
+
+    // Set the label text for each LegendEntry based on the categoryData HashMap
+    ArrayList<LegendEntry> legendEntries = new ArrayList<>();
+    i = 0;
+    for (Map.Entry<String, Double> entry : categoryData.entrySet()) {
+        legendEntries.add(new LegendEntry(entry.getKey(), Legend.LegendForm.SQUARE, 10f, 2f, null, colors[i % colors.length]));
+        i++;
+    }
+    legend.setCustom(legendEntries);
+}
+
+
 }

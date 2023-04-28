@@ -55,9 +55,9 @@ public class ManageTransactionsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_transactions);
-        initButtons();
-        initSpinners();
-        setupActivityListner();
+      //  initButtons();
+     //   initSpinners();
+      //  setupActivityListner();
 
     }
 
@@ -140,8 +140,9 @@ public class ManageTransactionsActivity extends AppCompatActivity {
     }
 
     private void initSpinners() {
-        Spinner csvMonthSpinner = findViewById(R.id.csvMonthSPpinner);
-        Spinner csvYearSpinner = findViewById(R.id.csvYearSpinner);
+        Spinner csvMonthSpinner = findViewById(R.id.monthSpinner);
+        Spinner csvYearSpinner = null;
+    //' = findViewById(R.id.csvYearSpinner);
 
         setMonthSpinner(csvMonthSpinner);
         setYearSpinner(csvYearSpinner);
