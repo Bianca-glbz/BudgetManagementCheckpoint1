@@ -2,15 +2,15 @@
     <!-- Base application theme. -->
     <style name="Theme.BudgetManagementCheckpoint1" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">#7E715D</item>
+        <item name="colorPrimary">#7E3638</item>
         <item name="colorPrimaryVariant">#D1AB9F</item>
         <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">#AC9779</item>
+        <item name="colorSecondaryVariant">#57202B</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">#837156</item>
+        <item name="android:statusBarColor">#BF7070</item>
         <!-- Customize your theme here. -->
     </style>
 </resources>

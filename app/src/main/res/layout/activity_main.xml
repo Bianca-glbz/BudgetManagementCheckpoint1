@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
+    android:background="@drawable/last"
     tools:context=".MainActivity">
 
     <Button
@@ -12,10 +12,12 @@
         android:layout_width="315dp"
         android:layout_height="50dp"
         android:background="@drawable/custom_button"
+        android:fontFamily="@font/alice"
         android:text="SIGN UP"
         android:textAlignment="center"
         android:textColor="#F8F4F4"
         android:textSize="20sp"
+        app:icon="@drawable/custom_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,6 +29,7 @@
         android:layout_width="315dp"
         android:layout_height="50dp"
         android:background="@drawable/custom_button"
+        android:fontFamily="@font/alice"
         android:text="SIGN IN"
         android:textAlignment="center"
         android:textColor="#F8F4F4"
@@ -39,33 +42,19 @@
 
     <TextView
         android:id="@+id/task_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="56dp"
+        android:layout_width="205dp"
+        android:layout_height="38dp"
+        android:layout_marginBottom="156dp"
+        android:fontFamily="@font/alice"
         android:text="Welcome "
         android:textAllCaps="true"
-        android:textColor="#0E0A0A"
-        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:textSize="34sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/SignUpMain"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.611"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="208dp"
-        android:layout_height="184dp"
-        android:layout_marginStart="97dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="97dp"
-        android:layout_marginBottom="239dp"
-        app:layout_constraintBottom_toTopOf="@+id/task_list"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.444"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/ss" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.BudgetManagementCheckpoint1" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">#B19C7C</item>
-        <item name="colorPrimaryVariant">#CFAB76</item>
+        <item name="colorPrimary">#591E25</item>
+        <item name="colorPrimaryVariant">#5C232F</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">#D4E7E5</item>

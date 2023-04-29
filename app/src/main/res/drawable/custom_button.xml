@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-<solid android:color="#886034"/>
+<solid android:color="#F0EAEB"/>
 
 
     <gradient
         android:angle="90"
-        android:endColor="#C58757"
-        android:startColor="#936542" />
+        android:endColor="#3C0D14"
+        android:startColor="#77535F" />
 
     <padding
         android:bottom="7dp"
@@ -17,7 +17,7 @@
 
     <stroke
         android:width="6dp"
-        android:color="#FFF" />
+        android:color="#CABDBD" />
     <!--android:dashGap="1dp"
     android:dashWidth="4dp"-->
 

@@ -18,12 +18,12 @@
             android:layout_marginBottom="32dp"/>
 
     <ImageView
-            android:id="@+id/imageView5"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:src="@drawable/ss"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="32dp"/>
+        android:id="@+id/imageView5"
+        android:layout_width="411dp"
+        android:layout_height="346dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/ss" />
 
    
 
@@ -49,28 +49,32 @@
     </LinearLayout>
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="32dp">
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:layout_marginTop="32dp"
+        android:orientation="horizontal">
 
         <Button
-                android:id="@+id/createTransactionBtn"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:background="@drawable/custom_button"
-                android:text="Create Transaction"
-                android:layout_marginEnd="8dp"/>
+            android:id="@+id/createTransactionBtn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/custom_button"
+            android:fontFamily="@font/alice"
+            android:text="Create Transaction"
+            android:textSize="8sp" />
 
         <Button
-                android:id="@+id/editTransactions"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:background="@drawable/custom_button"
-                android:text="Edit Transactions"
-                android:layout_marginEnd="8dp"/>
+            android:id="@+id/editTransactions"
+            android:layout_width="1dp"
+            android:layout_height="64dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/custom_button"
+            android:fontFamily="@font/alice"
+            android:text="Edit Transactions"
+            android:textSize="8sp" />
 
         <Button
             android:id="@+id/uploadFileButton"
@@ -78,11 +82,13 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/custom_button"
-            android:text="Upload CSV File" />
+            android:fontFamily="@font/alice"
+            android:text="Upload CSV File"
+            android:textSize="8sp" />
 
     </LinearLayout>
 
 
-   
+
 
 </LinearLayout>

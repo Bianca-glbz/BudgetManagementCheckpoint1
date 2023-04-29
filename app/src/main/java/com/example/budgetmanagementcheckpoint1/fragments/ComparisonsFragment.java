@@ -369,15 +369,6 @@ TableRow headerRow = new TableRow(getContext());
         // Set the BarData to the BarChart
         barChart.setData(barData);
 
-         // Customize the X-axis labels
-    // XAxis xAxis = barChart.getXAxis();
-    // xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-    // xAxis.setDrawGridLines(false);
-    // xAxis.setDrawAxisLine(true);
-    // xAxis.setGranularity(10f);
-    // xAxis.setCenterAxisLabels(true);
-    // xAxis.setLabelCount(categories.size());
-    // xAxis.setValueFormatter(new IndexAxisValueFormatter(categories));
 
     // Customize the gap between the bar chart groups (categories)
     float barWidth = 1.4f;
@@ -391,18 +382,6 @@ TableRow headerRow = new TableRow(getContext());
 
     // Show category labels below each group of bars
     barChart.getXAxis().setGranularity(2f);
-
-
-        
-
-        // Show category labels below each group of bars
-       // barChart.getXAxis().setAxisMinimum(categories.size());
-//        barChart.getXAxis().setGranularityEnabled(true);
-//        barChart.getXAxis().setGranularity(5.0f);
-//
-//        barChart.highlightValues(null);
-//        barChart.invalidate();
-//        barChart.animateY(1000);
 
         // Customize the legend
         Legend legend = barChart.getLegend();

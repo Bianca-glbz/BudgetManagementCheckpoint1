@@ -304,7 +304,6 @@ public class StatsFragment extends Fragment {
     }
 
     public void calculateStats() {
-        TextView statsText = getView().findViewById(R.id.statsTitle);
         PieChart chart = getView().findViewById(R.id.piechart);
 
         // Calculation to sum the total debit amount and calculate percentage for each category
